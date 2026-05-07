@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+<header th:replace="~{fragments/nav :: nav}"></header>
+<main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <h1 class="text-2xl font-semibold">Payloads</h1>
+
+    <form method="get" action="/payloads" class="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm">
+        <select name="target" class="bg-slate-900 border border-slate-800 rounded px-2 py-1">
+            <option value="">All targets</option>
+            <option th:each="t : ${targetCodes}" th:value="${t}" th:text="${t}" th:selected="${t == filterTarget}"></option>
+        </select>
+        <select name="pushStatus" class="bg-slate-900 border border-slate-800 rounded px-2 py-1">
+            <option value="">Any push</option>
+            <option th:each="s : ${pushStatuses}" th:value="${s}" th:text="${s}" th:selected="${s == filterPushStatus}"></option>
+        </select>
+        <input name="externalId" placeholder="external id contains" class="bg-slate-900 border border-slate-800 rounded px-2 py-1"
+               th:value="${filterExternalId}" />
+        <input name="limit" type="number" min="1" class="bg-slate-900 border border-slate-800 rounded px-2 py-1"
+               th:value="${filterLimit}" />
+        <button class="rounded bg-blue-600 text-white px-3 py-1 hover:bg-blue-500">Filter</button>
+    </form>
+
+    <div class="overflow-x-auto rounded-lg border border-slate-800">
+        <table class="min-w-full text-xs">
+            <thead class="bg-slate-900 text-slate-300">
+            <tr>
+                <th class="text-left px-3 py-2">ID</th>
+                <th class="text-left px-3 py-2">Target</th>
+                <th class="text-left px-3 py-2">Source</th>
+                <th class="text-left px-3 py-2">External ID</th>
+                <th class="text-left px-3 py-2">Push status</th>
+                <th class="text-left px-3 py-2">Retries</th>
+                <th class="text-left px-3 py-2">Updated</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${payloads}" class="border-t border-slate-800">
+                <td class="px-3 py-2"><a th:href="@{'/payloads/' + ${p.id}}" class="text-blue-300 hover:underline" th:text="${p.id}">1</a></td>
+                <td class="px-3 py-2 font-mono" th:text="${p.ingestTargetCode}">klickypedia-sets</td>
+                <td class="px-3 py-2 font-mono" th:text="${p.sourceCode}">klickypedia</td>
+                <td class="px-3 py-2 font-mono" th:text="${p.externalId}">slug</td>
+                <td class="px-3 py-2">
+                    <span class="badge"
+                          th:classappend="${p.pushStatus.name() == 'PUSHED'} ? 'badge-success'
+                                        : (${p.pushStatus.name() == 'FAILED'} ? 'badge-failed'
+                                        : (${p.pushStatus.name() == 'ALREADY_EXISTS'} ? 'badge-skipped'
+                                        : 'badge-pending'))"
+                          th:text="${p.pushStatus}">PENDING</span>
+                </td>
+                <td class="px-3 py-2" th:text="${p.pushRetryCount}">0</td>
+                <td class="px-3 py-2 text-slate-400" th:text="${p.updatedAt}">...</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

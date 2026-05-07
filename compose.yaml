@@ -1,0 +1,9 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: nookx-ingester-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: nookx_ingester
+    ports:
+      - "3306:3306"

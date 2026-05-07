@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+<header th:replace="~{fragments/nav :: nav}"></header>
+<main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <h1 class="text-2xl font-semibold">Overview</h1>
+
+    <section th:fragment="stats" id="overview-stats" class="space-y-6"
+             th:attr="hx-get='/fragments/overview', hx-trigger=|every ${pollIntervalMs}ms|, hx-swap='outerHTML'">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="rounded-lg bg-slate-900 border border-slate-800 p-4">
+                <div class="text-xs text-slate-400 uppercase">Running</div>
+                <div class="text-2xl font-semibold text-blue-300" th:text="${#lists.size(running)}">0</div>
+            </div>
+            <div class="rounded-lg bg-slate-900 border border-slate-800 p-4">
+                <div class="text-xs text-slate-400 uppercase">Success last 24h</div>
+                <div class="text-2xl font-semibold text-emerald-300" th:text="${successLast24h}">0</div>
+            </div>
+            <div class="rounded-lg bg-slate-900 border border-slate-800 p-4">
+                <div class="text-xs text-slate-400 uppercase">Failed last 24h</div>
+                <div class="text-2xl font-semibold text-red-300" th:text="${failedLast24h}">0</div>
+            </div>
+            <div class="rounded-lg bg-slate-900 border border-slate-800 p-4">
+                <div class="text-xs text-slate-400 uppercase">Pending push</div>
+                <div class="text-2xl font-semibold text-amber-300" th:text="${pendingPush}">0</div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="rounded-lg bg-slate-900 border border-slate-800 p-4">
+                <div class="text-sm text-slate-400 uppercase">Crawl queue</div>
+                <div class="mt-2 text-sm">
+                    <span class="text-slate-300">Pending: </span><span class="font-semibold" th:text="${pendingFetch}">0</span>
+                    &middot;
+                    <span class="text-slate-300">Failed: </span><span class="font-semibold text-red-300" th:text="${failedFetch}">0</span>
+                </div>
+            </div>
+            <div class="rounded-lg bg-slate-900 border border-slate-800 p-4">
+                <div class="text-sm text-slate-400 uppercase">Parse queue</div>
+                <div class="mt-2 text-sm">
+                    <span class="text-slate-300">Pending: </span><span class="font-semibold" th:text="${pendingParse}">0</span>
+                    &middot;
+                    <span class="text-slate-300">Failed: </span><span class="font-semibold text-red-300" th:text="${failedParse}">0</span>
+                </div>
+            </div>
+            <div class="rounded-lg bg-slate-900 border border-slate-800 p-4">
+                <div class="text-sm text-slate-400 uppercase">Push queue</div>
+                <div class="mt-2 text-sm">
+                    <span class="text-slate-300">Pending: </span><span class="font-semibold" th:text="${pendingPush}">0</span>
+                    &middot;
+                    <span class="text-slate-300">Failed: </span><span class="font-semibold text-red-300" th:text="${failedPush}">0</span>
+                </div>
+            </div>
+        </div>
+
+        <section>
+            <h2 class="text-lg font-semibold mb-2">Currently running</h2>
+            <div class="overflow-x-auto rounded-lg border border-slate-800">
+                <table class="min-w-full text-sm">
+                    <thead class="bg-slate-900 text-slate-300">
+                    <tr>
+                        <th class="text-left px-3 py-2">ID</th>
+                        <th class="text-left px-3 py-2">Stage</th>
+                        <th class="text-left px-3 py-2">Scope</th>
+                        <th class="text-left px-3 py-2">Trigger</th>
+                        <th class="text-left px-3 py-2">Started</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(running)}">
+                        <td class="px-3 py-3 text-slate-500" colspan="5">No jobs currently running</td>
+                    </tr>
+                    <tr th:each="job : ${running}" class="border-t border-slate-800">
+                        <td class="px-3 py-2"><a th:href="@{'/jobs/' + ${job.id}}" class="text-blue-300 hover:underline" th:text="${job.id}">1</a></td>
+                        <td class="px-3 py-2" th:text="${job.stage}">DISCOVERY</td>
+                        <td class="px-3 py-2" th:text="${job.scopeType + (job.scopeCode != null ? ' / ' + job.scopeCode : '')}">SOURCE / klickypedia</td>
+                        <td class="px-3 py-2" th:text="${job.triggerType}">MANUAL</td>
+                        <td class="px-3 py-2" th:text="${job.startedAt}">2025-...</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-lg font-semibold mb-2">Recent jobs</h2>
+            <div class="overflow-x-auto rounded-lg border border-slate-800">
+                <table class="min-w-full text-sm">
+                    <thead class="bg-slate-900 text-slate-300">
+                    <tr>
+                        <th class="text-left px-3 py-2">ID</th>
+                        <th class="text-left px-3 py-2">Stage</th>
+                        <th class="text-left px-3 py-2">Scope</th>
+                        <th class="text-left px-3 py-2">Status</th>
+                        <th class="text-left px-3 py-2">Started</th>
+                        <th class="text-left px-3 py-2">Ended</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="job : ${recent}" class="border-t border-slate-800">
+                        <td class="px-3 py-2"><a th:href="@{'/jobs/' + ${job.id}}" class="text-blue-300 hover:underline" th:text="${job.id}">1</a></td>
+                        <td class="px-3 py-2" th:text="${job.stage}">CRAWL</td>
+                        <td class="px-3 py-2" th:text="${job.scopeType + (job.scopeCode != null ? ' / ' + job.scopeCode : '')}">GLOBAL</td>
+                        <td class="px-3 py-2">
+                            <span class="badge"
+                                  th:classappend="${job.status.name() == 'SUCCESS'} ? 'badge-success'
+                                                : (${job.status.name() == 'FAILED'} ? 'badge-failed'
+                                                : (${job.status.name() == 'RUNNING'} ? 'badge-running'
+                                                : 'badge-skipped'))"
+                                  th:text="${job.status}">SUCCESS</span>
+                        </td>
+                        <td class="px-3 py-2" th:text="${job.startedAt}">...</td>
+                        <td class="px-3 py-2" th:text="${job.endedAt}">...</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </section>
+</main>
+</body>
+</html>

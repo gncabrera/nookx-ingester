@@ -1,0 +1,44 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<tr th:fragment="row(source, flashMessage)" th:id="|source-row-${source.code}|" class="border-t border-slate-800">
+    <td class="px-3 py-2 font-mono" th:text="${source.code}">klickypedia</td>
+    <td class="px-3 py-2 font-mono" th:text="${source.ingestTargetCode}">klickypedia-sets</td>
+    <td class="px-3 py-2">
+        <span class="badge"
+              th:classappend="${source.enabled} ? 'badge-success' : 'badge-skipped'"
+              th:text="${source.enabled} ? 'enabled' : 'disabled'">enabled</span>
+    </td>
+    <td class="px-3 py-2 font-mono text-xs" th:text="${source.discoveryCron}">0 0 0 ? * MON</td>
+    <td class="px-3 py-2">
+        <span th:text="${source.pendingFetch}">0</span>
+        /
+        <span class="text-red-300" th:text="${source.failedFetch}">0</span>
+    </td>
+    <td class="px-3 py-2">
+        <span th:text="${source.pendingParse}">0</span>
+        /
+        <span class="text-red-300" th:text="${source.failedParse}">0</span>
+    </td>
+    <td class="px-3 py-2 space-x-2 whitespace-nowrap">
+        <button class="px-2 py-1 rounded bg-blue-600 text-white text-xs hover:bg-blue-500"
+                th:attr="hx-post=|/sources/${source.code}/discovery/run|, hx-target=|#source-row-${source.code}|, hx-swap='outerHTML'">
+            Run discovery
+        </button>
+        <button class="px-2 py-1 rounded bg-blue-600 text-white text-xs hover:bg-blue-500"
+                th:attr="hx-post=|/sources/${source.code}/crawl/run|, hx-target=|#source-row-${source.code}|, hx-swap='outerHTML'">
+            Run crawl
+        </button>
+        <button class="px-2 py-1 rounded bg-amber-600 text-white text-xs hover:bg-amber-500"
+                th:attr="hx-post=|/sources/${source.code}/errors/reset?stage=crawl|, hx-target=|#source-row-${source.code}|, hx-swap='outerHTML'">
+            Reset crawl errors
+        </button>
+        <button class="px-2 py-1 rounded bg-amber-600 text-white text-xs hover:bg-amber-500"
+                th:attr="hx-post=|/sources/${source.code}/errors/reset?stage=parse|, hx-target=|#source-row-${source.code}|, hx-swap='outerHTML'">
+            Reset parse errors
+        </button>
+        <span th:if="${flashMessage != null}" class="text-xs text-emerald-400 ml-2" th:text="${flashMessage}"></span>
+    </td>
+</tr>
+</body>
+</html>

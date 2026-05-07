@@ -1,0 +1,19 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<header th:fragment="nav" class="border-b border-slate-800 bg-slate-900">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+        <a href="/" class="text-lg font-semibold text-white">nookx-ingester</a>
+        <nav class="flex gap-4 text-sm text-slate-300">
+            <a href="/" class="hover:text-white">Overview</a>
+            <a href="/sources" class="hover:text-white">Sources</a>
+            <a href="/ingest-targets" class="hover:text-white">Ingest targets</a>
+            <a href="/pages" class="hover:text-white">Pages</a>
+            <a href="/payloads" class="hover:text-white">Payloads</a>
+            <a href="/jobs" class="hover:text-white">Jobs</a>
+            <a href="/logs" class="hover:text-white">Logs</a>
+        </nav>
+    </div>
+</header>
+</body>
+</html>

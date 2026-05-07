@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+<header th:replace="~{fragments/nav :: nav}"></header>
+<main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <h1 class="text-2xl font-semibold">Ingest targets</h1>
+
+    <div class="overflow-x-auto rounded-lg border border-slate-800">
+        <table class="min-w-full text-sm">
+            <thead class="bg-slate-900 text-slate-300">
+            <tr>
+                <th class="text-left px-3 py-2">Code</th>
+                <th class="text-left px-3 py-2">Payload</th>
+                <th class="text-left px-3 py-2">Enabled</th>
+                <th class="text-left px-3 py-2">Push cron</th>
+                <th class="text-left px-3 py-2">Base URL</th>
+                <th class="text-left px-3 py-2">Pending / Pushed / Failed / Existed</th>
+                <th class="text-left px-3 py-2">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="target : ${targets}"
+                th:replace="~{ingest_targets/_row :: row(${target}, null)}">
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

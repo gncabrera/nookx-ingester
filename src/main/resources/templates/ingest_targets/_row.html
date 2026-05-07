@@ -1,0 +1,36 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<tr th:fragment="row(target, flashMessage)" th:id="|target-row-${target.code}|" class="border-t border-slate-800">
+    <td class="px-3 py-2 font-mono" th:text="${target.code}">klickypedia-sets</td>
+    <td class="px-3 py-2 font-mono text-xs" th:text="${target.payloadType}">NormalizedSetPayload</td>
+    <td class="px-3 py-2">
+        <span class="badge"
+              th:classappend="${target.enabled} ? 'badge-success' : 'badge-skipped'"
+              th:text="${target.enabled} ? 'enabled' : 'disabled'">enabled</span>
+    </td>
+    <td class="px-3 py-2 font-mono text-xs" th:text="${target.pushCron}">0 */5 * * * *</td>
+    <td class="px-3 py-2 font-mono text-xs" th:text="${target.baseUrl}">http://localhost:8080</td>
+    <td class="px-3 py-2 text-xs">
+        <span th:text="${target.pendingPush}">0</span>
+        /
+        <span class="text-emerald-300" th:text="${target.pushedCount}">0</span>
+        /
+        <span class="text-red-300" th:text="${target.failedPush}">0</span>
+        /
+        <span class="text-amber-300" th:text="${target.alreadyExists}">0</span>
+    </td>
+    <td class="px-3 py-2 space-x-2 whitespace-nowrap">
+        <button class="px-2 py-1 rounded bg-blue-600 text-white text-xs hover:bg-blue-500"
+                th:attr="hx-post=|/ingest-targets/${target.code}/push/run|, hx-target=|#target-row-${target.code}|, hx-swap='outerHTML'">
+            Run push
+        </button>
+        <button class="px-2 py-1 rounded bg-amber-600 text-white text-xs hover:bg-amber-500"
+                th:attr="hx-post=|/ingest-targets/${target.code}/errors/reset|, hx-target=|#target-row-${target.code}|, hx-swap='outerHTML'">
+            Reset push errors
+        </button>
+        <span th:if="${flashMessage != null}" class="text-xs text-emerald-400 ml-2" th:text="${flashMessage}"></span>
+    </td>
+</tr>
+</body>
+</html>

@@ -1,0 +1,11 @@
+FROM eclipse-temurin:21-jre
+
+WORKDIR /app
+
+COPY target/nookx-ingester-0.0.1-SNAPSHOT.jar app.jar
+
+VOLUME ["/data"]
+
+EXPOSE 8081
+
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]

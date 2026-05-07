@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+<header th:replace="~{fragments/nav :: nav}"></header>
+<main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <h1 class="text-2xl font-semibold">Job <span class="font-mono" th:text="${job.id}">1</span></h1>
+
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+        <div class="rounded-lg bg-slate-900 border border-slate-800 p-3">
+            <div class="text-xs text-slate-400 uppercase">Stage</div>
+            <div th:text="${job.stage}">CRAWL</div>
+        </div>
+        <div class="rounded-lg bg-slate-900 border border-slate-800 p-3">
+            <div class="text-xs text-slate-400 uppercase">Scope</div>
+            <div th:text="${job.scopeType + (job.scopeCode != null ? ' / ' + job.scopeCode : '')}">GLOBAL</div>
+        </div>
+        <div class="rounded-lg bg-slate-900 border border-slate-800 p-3">
+            <div class="text-xs text-slate-400 uppercase">Status</div>
+            <div th:text="${job.status}">SUCCESS</div>
+        </div>
+        <div class="rounded-lg bg-slate-900 border border-slate-800 p-3">
+            <div class="text-xs text-slate-400 uppercase">Trigger</div>
+            <div th:text="${job.triggerType}">MANUAL</div>
+        </div>
+        <div class="rounded-lg bg-slate-900 border border-slate-800 p-3">
+            <div class="text-xs text-slate-400 uppercase">Started</div>
+            <div class="font-mono text-xs" th:text="${job.startedAt}">...</div>
+        </div>
+        <div class="rounded-lg bg-slate-900 border border-slate-800 p-3">
+            <div class="text-xs text-slate-400 uppercase">Ended</div>
+            <div class="font-mono text-xs" th:text="${job.endedAt}">...</div>
+        </div>
+    </section>
+
+    <section th:if="${job.metricsJson != null}">
+        <h2 class="text-lg font-semibold mb-2">Metrics</h2>
+        <pre class="bg-slate-900 border border-slate-800 rounded p-3 text-xs overflow-auto" th:text="${job.metricsJson}">{}</pre>
+    </section>
+
+    <section th:if="${job.errorMessage != null}">
+        <h2 class="text-lg font-semibold mb-2">Error</h2>
+        <pre class="bg-slate-900 border border-red-800 rounded p-3 text-xs text-red-300 overflow-auto" th:text="${job.errorMessage}"></pre>
+    </section>
+
+    <section th:fragment="logs" id="job-logs"
+             th:attr="hx-get=|/jobs/${job.id}/logs|, hx-trigger=|every ${pollIntervalMs}ms|, hx-swap='outerHTML'">
+        <h2 class="text-lg font-semibold mb-2">Logs</h2>
+        <div class="rounded-lg bg-slate-900 border border-slate-800 overflow-x-auto">
+            <table class="min-w-full text-xs font-mono">
+                <thead class="bg-slate-800 text-slate-300">
+                <tr>
+                    <th class="text-left px-3 py-2">Timestamp</th>
+                    <th class="text-left px-3 py-2">Level</th>
+                    <th class="text-left px-3 py-2">Logger</th>
+                    <th class="text-left px-3 py-2">Message</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(logs)}">
+                    <td class="px-3 py-3 text-slate-500" colspan="4">No logs yet</td>
+                </tr>
+                <tr th:each="log : ${logs}" class="border-t border-slate-800">
+                    <td class="px-3 py-1 text-slate-400" th:text="${log.ts}">...</td>
+                    <td class="px-3 py-1"
+                        th:classappend="${log.level == 'ERROR'} ? 'text-red-300' : (${log.level == 'WARN'} ? 'text-amber-300' : 'text-slate-200')"
+                        th:text="${log.level}">INFO</td>
+                    <td class="px-3 py-1 text-slate-500" th:text="${log.loggerName}">...</td>
+                    <td class="px-3 py-1 text-slate-200 break-all" th:text="${log.message}">message</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

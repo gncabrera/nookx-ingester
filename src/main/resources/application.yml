@@ -1,0 +1,69 @@
+server:
+    port: 8081
+
+spring:
+    application:
+        name: nookx-ingester
+    task:
+        scheduling:
+            pool:
+                size: 4
+            thread-name-prefix: ingester-scheduler-
+    datasource:
+        url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:nookx_ingester}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+        username: ${DB_USER:root}
+        password: ${DB_PASSWORD:root}
+    jpa:
+        hibernate:
+            ddl-auto: validate
+        properties:
+            hibernate:
+                format_sql: false
+        open-in-view: false
+    flyway:
+        enabled: true
+        locations: classpath:db/migration
+    thymeleaf:
+        cache: false
+
+logging:
+    level:
+        root: INFO
+        com.nookx.ingester: INFO
+
+ingester:
+    http:
+        user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0
+        connect-timeout-ms: 10000
+        request-timeout-ms: 30000
+    storage:
+        raw-dir: ${INGESTER_RAW_DIR:/data/raw}
+        asset-dir: ${INGESTER_ASSET_DIR:/data/assets}
+    schedule:
+        crawl-delay-ms: 15000
+        crawl-initial-delay-ms: 5000
+        parse-delay-ms: 5000
+        parse-initial-delay-ms: 5000
+    job:
+        log-retention-days: 90
+        log-min-level: INFO
+        retention-cron: "0 0 3 * * *"
+    dashboard:
+        poll-interval-ms: 3000
+        log-tail-lines: 500
+    sources:
+        klickypedia:
+            enabled: true
+            min-delay-ms: 10000
+            jitter-ms: 800
+            discovery-cron: "0 0 0 ? * MON"
+            #discovery-cron: "*/30 * * * * *"
+    ingest-targets:
+        klickypedia-sets:
+            enabled: true
+            base-url: ${NOOKX_BASE_URL:http://localhost:8080}
+            api-key: ${NOOKX_API_KEY:changeme}
+            max-batch-size: 100
+            push-cron: "0 */5 * * * *"
+            options:
+                interest-id: "1"

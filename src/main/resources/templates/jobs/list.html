@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+<header th:replace="~{fragments/nav :: nav}"></header>
+<main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <h1 class="text-2xl font-semibold">Jobs</h1>
+    <div class="overflow-x-auto rounded-lg border border-slate-800">
+        <table class="min-w-full text-sm">
+            <thead class="bg-slate-900 text-slate-300">
+            <tr>
+                <th class="text-left px-3 py-2">ID</th>
+                <th class="text-left px-3 py-2">Stage</th>
+                <th class="text-left px-3 py-2">Scope</th>
+                <th class="text-left px-3 py-2">Trigger</th>
+                <th class="text-left px-3 py-2">Status</th>
+                <th class="text-left px-3 py-2">Started</th>
+                <th class="text-left px-3 py-2">Ended</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="job : ${jobs}" class="border-t border-slate-800">
+                <td class="px-3 py-2 font-mono"><a th:href="@{'/jobs/' + ${job.id}}" class="text-blue-300 hover:underline" th:text="${job.id}">1</a></td>
+                <td class="px-3 py-2" th:text="${job.stage}">CRAWL</td>
+                <td class="px-3 py-2" th:text="${job.scopeType + (job.scopeCode != null ? ' / ' + job.scopeCode : '')}">GLOBAL</td>
+                <td class="px-3 py-2" th:text="${job.triggerType}">SCHEDULED</td>
+                <td class="px-3 py-2">
+                    <span class="badge"
+                          th:classappend="${job.status.name() == 'SUCCESS'} ? 'badge-success'
+                                        : (${job.status.name() == 'FAILED'} ? 'badge-failed'
+                                        : (${job.status.name() == 'RUNNING'} ? 'badge-running'
+                                        : 'badge-skipped'))"
+                          th:text="${job.status}">SUCCESS</span>
+                </td>
+                <td class="px-3 py-2 text-slate-400" th:text="${job.startedAt}">...</td>
+                <td class="px-3 py-2 text-slate-400" th:text="${job.endedAt}">...</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>
