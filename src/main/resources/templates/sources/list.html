@@ -20,9 +20,9 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="source : ${sources}"
-                th:replace="~{sources/_row :: row(${source}, null)}">
-            </tr>
+            <th:block th:each="source : ${sources}">
+                <tr th:replace="~{sources/_row :: row(${source}, null)}"></tr>
+            </th:block>
             </tbody>
         </table>
     </div>

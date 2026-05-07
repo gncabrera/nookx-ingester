@@ -62,7 +62,7 @@ ingester:
         klickypedia-sets:
             enabled: true
             base-url: ${NOOKX_BASE_URL:http://localhost:8080}
-            api-key: ${NOOKX_API_KEY:changeme}
+            api-key: ${NOOKX_API_KEY:el-pepe-de-la-gente-525351213578751}
             max-batch-size: 100
             push-cron: "0 */5 * * * *"
             options:

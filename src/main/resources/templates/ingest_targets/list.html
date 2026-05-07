@@ -20,9 +20,9 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="target : ${targets}"
-                th:replace="~{ingest_targets/_row :: row(${target}, null)}">
-            </tr>
+            <th:block th:each="target : ${targets}">
+                <tr th:replace="~{ingest_targets/_row :: row(${target}, null)}"></tr>
+            </th:block>
             </tbody>
         </table>
     </div>
