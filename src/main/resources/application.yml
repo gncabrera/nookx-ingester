@@ -64,6 +64,6 @@ ingester:
             base-url: ${NOOKX_BASE_URL:http://localhost:8080}
             api-key: ${NOOKX_API_KEY:el-pepe-de-la-gente-525351213578751}
             max-batch-size: 100
-            push-cron: "0 */5 * * * *"
+            push-cron: "0 */1 * * * *"
             options:
                 interest-id: "1"
