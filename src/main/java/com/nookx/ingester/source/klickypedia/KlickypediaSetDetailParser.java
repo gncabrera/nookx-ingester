@@ -442,6 +442,9 @@ Hay tipos de sets que se llaman 1-2-3, en ese caso ignorar los numeros 1-2-3
         if (href.isBlank() || !seen.add(href)) {
             return sortOrder;
         }
+        if(href.startsWith("https://www.klickypedia.com/summary-sets-images")) {
+            return sortOrder;
+        }
         assets.add(new NormalizedAssetDto(href, AssetKind.IMAGE, labelFor(anchor), sortOrder));
         return sortOrder + 1;
     }
