@@ -88,19 +88,29 @@ public class KlickypediaSetDetailParser implements PageParser<NormalizedSetPaylo
         return ParseResult.ofPayload(payload);
     }
 
+    private static List<String> EMPTY_VALUES = List.of("n/a", "(n/a)", "none");
     private ObjectNode buildRawAttributes(final Map<String, String> names, final Map<String, String> labelled, final String tags) {
         final ObjectNode node = objectMapper.createObjectNode();
         for (final Map.Entry<String, String> entry : names.entrySet()) {
             if ("name".equals(entry.getKey())) {
                 continue;
             }
-            node.put(entry.getKey(), entry.getValue());
+
+            String value = entry.getValue();
+            if(entry.getValue() != null && EMPTY_VALUES.contains(entry.getValue().toLowerCase())) {
+                value = "";
+            }
+            node.put(entry.getKey(), value);
         }
         for (final Map.Entry<String, String> entry : labelled.entrySet()) {
             if ("name".equals(entry.getKey()) || RELEASED_KEY.equals(entry.getKey())) {
                 continue;
             }
-            node.put(entry.getKey(), entry.getValue());
+            String value = entry.getValue();
+            if(entry.getValue() != null && EMPTY_VALUES.contains(entry.getValue().toLowerCase())) {
+                value = "";
+            }
+            node.put(entry.getKey(), value);
         }
         if (tags != null && !tags.isBlank()) {
             node.put("tags", tags);
