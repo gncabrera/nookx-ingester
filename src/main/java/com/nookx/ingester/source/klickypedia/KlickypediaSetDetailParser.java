@@ -39,6 +39,8 @@ public class KlickypediaSetDetailParser implements PageParser<NormalizedSetPaylo
     private static final String FLAG_FR = "flag-france";
     private static final String RELEASED_KEY = "released";
     private static final Pattern FULL_DATE_PATTERN = Pattern.compile("\\b(\\d{4})-(\\d{2})-(\\d{2})\\b");
+    private static final Pattern SET_NUMBER_PREFIX = Pattern.compile("^(\\d+(?:[vs]\\d+)?(?:-\\d+)*)");
+    private static final String ONE_TWO_THREE_SUFFIX = "-1-2-3";
     private static final Pattern YEAR_PATTERN = Pattern.compile("\\b(19\\d{2}|20\\d{2})\\b");
     private static final DateTimeFormatter ISO_DATE = DateTimeFormatter.ISO_LOCAL_DATE;
 
@@ -61,6 +63,7 @@ public class KlickypediaSetDetailParser implements PageParser<NormalizedSetPaylo
         if (slug == null) {
             return ParseResult.empty();
         }
+        final String setNumber = extractSetNumber(slug);
         final Element infoBlock = doc.selectFirst("div.caja_set_info");
         final Map<String, String> names = new LinkedHashMap<>();
         final Map<String, String> labelled = new LinkedHashMap<>();
@@ -74,7 +77,7 @@ public class KlickypediaSetDetailParser implements PageParser<NormalizedSetPaylo
         final ObjectNode rawAttributes = buildRawAttributes(names, labelled, tags);
         final NormalizedSetPayload payload = new NormalizedSetPayload(
             slug,
-            slug,
+            setNumber,
             name,
             null,
             releaseDate,
@@ -103,6 +106,56 @@ public class KlickypediaSetDetailParser implements PageParser<NormalizedSetPaylo
             node.put("tags", tags);
         }
         return node;
+    }
+
+/**
+ * 
+ 56-32-65-asdasd > 56-32-65
+5454 > 5454
+5454-abc > 5454
+abc > abc
+abc-123 > abc-123
+9421v1-automata > 9421v1
+3573v3-2-cyclists > 3573v3-2
+3172s1-security-check-in > 3172s1
+
+Si el setNumber termina siendo solo ceros, devolver todo excepto los ceros:
+0000-ger-luv-construction-worker > ger-luv-construction-worker
+00000-ger-playmobil-comic-1-2018-heft-29-a-thief-at-the-construction-area > ger-playmobil-comic-1-2018-heft-29-a-thief-at-the-construction-area 
+
+Hay tipos de sets que se llaman 1-2-3, en ese caso ignorar los numeros 1-2-3
+5497-1-2-3-advent-calendar-christmas-in-the-forest > 5497
+ */
+    private static String extractSetNumber(final String slug) {
+        if (slug == null || slug.isEmpty() || !Character.isDigit(slug.charAt(0))) {
+            return slug;
+        }
+        final Matcher matcher = SET_NUMBER_PREFIX.matcher(slug);
+        if (!matcher.find()) {
+            return slug;
+        }
+        final String matched = matcher.group(1);
+        if (isOnlyZeros(matched)) {
+            final String remainder = slug.substring(matcher.end());
+            if (remainder.startsWith("-")) {
+                return remainder.substring(1);
+            }
+            return remainder;
+        }
+        if (matched.endsWith(ONE_TWO_THREE_SUFFIX)) {
+            return matched.substring(0, matched.length() - ONE_TWO_THREE_SUFFIX.length());
+        }
+        return matched;
+    }
+
+    private static boolean isOnlyZeros(final String value) {
+        for (int index = 0; index < value.length(); index++) {
+            final char character = value.charAt(index);
+            if (character != '0' && character != '-') {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static String extractSlug(final String url, final String naturalKey) {
